@@ -26,3 +26,14 @@ func GetAPIKey(headers http.Header) (string, error) {
 
 	return vals[1], nil
 }
+
+func GetAPIKeyFromCookie(r *http.Request) (string, error) {
+	cookie, err := r.Cookie("apikey")
+	if err != nil {
+		return "", err
+	}
+
+	apiKey := cookie.Value
+
+	return apiKey, nil
+}

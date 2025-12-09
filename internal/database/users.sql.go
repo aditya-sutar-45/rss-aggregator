@@ -13,18 +13,19 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (id, created_at, updated_at, username, api_key)
-VALUES ($1, $2, $3, $4, 
+INSERT INTO users (id, created_at, updated_at, username, password_hash, api_key)
+VALUES ($1, $2, $3, $4, $5,
     encode(sha256(random()::text::bytea), 'hex')
 )
-RETURNING id, created_at, updated_at, username, api_key
+RETURNING id, created_at, updated_at, username, api_key, password_hash
 `
 
 type CreateUserParams struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Username  string
+	ID           uuid.UUID
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Username     string
+	PasswordHash string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -33,6 +34,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.Username,
+		arg.PasswordHash,
 	)
 	var i User
 	err := row.Scan(
@@ -41,12 +43,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.Username,
 		&i.ApiKey,
+		&i.PasswordHash,
 	)
 	return i, err
 }
 
 const getUserByAPIKey = `-- name: GetUserByAPIKey :one
-SELECT id, created_at, updated_at, username, api_key FROM USERS WHERE api_key = $1
+SELECT id, created_at, updated_at, username, api_key, password_hash FROM USERS WHERE api_key = $1
 `
 
 func (q *Queries) GetUserByAPIKey(ctx context.Context, apiKey string) (User, error) {
@@ -58,6 +61,25 @@ func (q *Queries) GetUserByAPIKey(ctx context.Context, apiKey string) (User, err
 		&i.UpdatedAt,
 		&i.Username,
 		&i.ApiKey,
+		&i.PasswordHash,
+	)
+	return i, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id, created_at, updated_at, username, api_key, password_hash FROM users WHERE username = $1
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Username,
+		&i.ApiKey,
+		&i.PasswordHash,
 	)
 	return i, err
 }

@@ -53,7 +53,7 @@ func main() {
 		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
+		AllowCredentials: true,
 		MaxAge:           300,
 	}))
 
@@ -61,8 +61,13 @@ func main() {
 	v1Router.Get("/healthz", handlerReadiness)
 	v1Router.Get("/err", handlerErr)
 
-	v1Router.Post("/users", apiCfg.handlerCreateUser)
+	// v1Router.Post("/users", apiCfg.handlerCreateUser)
 	v1Router.Get("/users", apiCfg.middlewareAuth(apiCfg.handlerGetUser))
+
+	v1Router.Post("/auth/register", apiCfg.handlerRegister)
+	v1Router.Post("/auth/login", apiCfg.handlerLogin)
+	v1Router.Get("/auth/test", apiCfg.middlewareAuth(apiCfg.handlerAuthTest))
+	v1Router.Get("/auth/logout", apiCfg.handlerLogout)
 
 	v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
 	v1Router.Get("/feeds", apiCfg.handlerGetFeeds)

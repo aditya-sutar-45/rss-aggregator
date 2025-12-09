@@ -12,9 +12,9 @@ type authedHandler func(http.ResponseWriter, *http.Request, database.User)
 
 func (cfg *apiConfig) middlewareAuth(handler authedHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		apiKey, err := auth.GetAPIKey(r.Header)
+		apiKey, err := auth.GetAPIKeyFromCookie(r)
 		if err != nil {
-			respondWithErr(w, 403, fmt.Sprintf("Auth Error: %v\n", err))
+			respondWithErr(w, 403, fmt.Sprintf("no user found: %v\n", err))
 			return
 		}
 

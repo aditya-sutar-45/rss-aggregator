@@ -1,10 +1,13 @@
 -- name: CreateUser :one
-INSERT INTO users (id, created_at, updated_at, username, api_key)
-VALUES ($1, $2, $3, $4, 
+INSERT INTO users (id, created_at, updated_at, username, password_hash, api_key)
+VALUES ($1, $2, $3, $4, $5,
     encode(sha256(random()::text::bytea), 'hex')
 )
 RETURNING *;
 
 -- name: GetUserByAPIKey :one
 SELECT * FROM USERS WHERE api_key = $1;
+
+-- name: GetUserByUsername :one
+SELECT * FROM users WHERE username = $1;
 
