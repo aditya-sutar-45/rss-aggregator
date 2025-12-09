@@ -115,8 +115,14 @@ func (apiCfg *apiConfig) handlerLogout(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, 200, res)
 }
 
-func (apiCfg *apiConfig) handlerAuthTest(w http.ResponseWriter, r *http.Request, user database.User) {
-	respondWithJSON(w, 200, struct{}{})
+func (apiCfg *apiConfig) handlerCheckAuth(w http.ResponseWriter, r *http.Request, u database.User) {
+	type Response struct {
+		Message string `json:"message"`
+	}
+	res := Response{
+		Message: "user logged in",
+	}
+	respondWithJSON(w, 200, res)
 }
 
 /*

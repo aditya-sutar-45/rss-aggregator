@@ -66,7 +66,7 @@ func main() {
 
 	v1Router.Post("/auth/register", apiCfg.handlerRegister)
 	v1Router.Post("/auth/login", apiCfg.handlerLogin)
-	v1Router.Get("/auth/test", apiCfg.middlewareAuth(apiCfg.handlerAuthTest))
+	v1Router.Get("/auth/test", apiCfg.middlewareAuth(apiCfg.handlerCheckAuth))
 	v1Router.Get("/auth/logout", apiCfg.handlerLogout)
 
 	v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
